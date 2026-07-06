@@ -1,0 +1,5 @@
+# PySysComply requirements
+# This project uses only Python standard library modules
+# No external dependencies required
+
+# Python version: 3.6+
