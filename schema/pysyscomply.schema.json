@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PyCISScan Benchmark Schema",
+  "description": "JSON schema for CIS benchmark configuration files used by PyCISScan",
+  "type": "object",
+  "required": [
+    "title",
+    "items"
+  ],
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the benchmark"
+    },
+    "compiled_by": {
+      "type": "string",
+      "description": "Name of the person who compiled the benchmark"
+    },
+    "compiled_on": {
+      "type": "string",
+      "description": "Date when the benchmark was compiled (format: YYYY/MM/DD)"
+    },
+    "items": {
+      "type": "array",
+      "description": "List of audit test items",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "audit"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name/identifier of the test item"
+          },
+          "labels": {
+            "type": "array",
+            "description": "List of labels associated with this item",
+            "items": {
+              "type": "string"
+            }
+          },
+          "audit": {
+            "type": "array",
+            "description": "List of audit commands to execute for this test",
+            "items": {
+              "type": "object",
+              "required": [
+                "cmd",
+                "response_conditions"
+              ],
+              "properties": {
+                "cmd": {
+                  "type": "string",
+                  "description": "Shell command to execute"
+                },
+                "response_conditions": {
+                  "type": "array",
+                  "description": "List of conditions to evaluate against command output",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "condition",
+                      "control_flag",
+                      "on"
+                    ],
+                    "properties": {
+                      "condition": {
+                        "type": "string",
+                        "enum": [
+                          "like",
+                          "not_like",
+                          "pass_if_no_lines",
+                          "pass_if_lines",
+                          "default_pass"
+                        ],
+                        "description": "Type of condition to evaluate"
+                      },
+                      "like_to": {
+                        "type": "string",
+                        "description": "String to search for in output (used with 'like' condition)"
+                      },
+                      "not_like_to": {
+                        "type": "string",
+                        "description": "String that should NOT be in output (used with 'not_like' condition)"
+                      },
+                      "control_flag": {
+                        "type": "string",
+                        "enum": [
+                          "required",
+                          "optional"
+                        ],
+                        "description": "Whether this condition is required or optional for test to pass"
+                      },
+                      "on": {
+                        "type": "string",
+                        "enum": [
+                          "stdout",
+                          "stderr"
+                        ],
+                        "description": "Whether to evaluate condition against stdout or stderr"
+                      }
+                    }
+                  }
+                },
+                "labels": {
+                  "type": "array",
+                  "description": "List of labels for the audit block",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
