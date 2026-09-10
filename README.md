@@ -22,7 +22,7 @@ The basic concept is:
 
 ## Reports
 
-## The pythin library
+## The python library
 
 
 ## Works in progress
