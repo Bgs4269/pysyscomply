@@ -450,7 +450,7 @@ CMDLET_REGISTRY: Dict[str, Tuple[str, Callable[..., Tuple[int, str, str]]]] = {
     'csvfilter': ('internal', InternalCmdlets.csvfilter),
     'mountopt': ('internal', InternalCmdlets.mountopt),
     'ismount': ('internal', InternalCmdlets.ismount),
-    'bootmoxunted': ('internal', InternalCmdlets.bootmounted),
+    'bootmounted': ('internal', InternalCmdlets.bootmounted),
 }
 
 
