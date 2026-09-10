@@ -1,0 +1,16 @@
+#!/bin/bash
+
+[[ $# != 1 || ${1} == "-h" ]] && 
+  {
+    echo "Usage: list_testbook [testbook.json]"
+    exit 1
+  }
+
+tb=${1}
+
+[[ ! -f ${tb} ]] &&
+  {
+    echo "Not a file."
+  }
+
+jq -r '.items[] | [.name, (.details | tostring), (.labels | tostring)] | join("\t# ")' ${tb}

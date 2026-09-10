@@ -1,0 +1,242 @@
+{
+    "title": "CIS for Redhat 9 v2.0 Benchmark - Section 1.1.2",
+    "compiled_by": "TheZoltan",
+    "compiled_on": "2026-08-08T12:00:00Z",
+    "items": [
+        {
+            "name": "1.1.2.1.1 Ensure /tmp is a separate partition",
+            "details": "The /tmp directory must be a separate partition or tmpfs. It must also be mounted at boot.",
+            "labels": ["CIS"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "ismount",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": [
+                            "/tmp"
+                        ]
+                    },
+                    "audit_test_name": "slash_tmp_is_partition",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 0,
+                            "control_flag": "required",
+                            "on": "result_code"
+                        }
+                    ]
+                },
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "bootmounted",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": [
+                            "/tmp"
+                        ]
+                    },
+                    "audit_test_name": "slash_tmp_is_boot_mounted",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 0,
+                            "control_flag": "required",
+                            "on": "result_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "1.1.2.1.2 Ensure nodev option set on /tmp partition",
+            "details": "The /tmp directory must have the nodev option set in the active mount.",
+            "labels": ["CIS"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": [
+                            "mountpoint",
+                            "/tmp"
+                        ]
+                    },
+                    "audit_test_name": "slash_tmp_nodev_option",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "nodev",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "1.1.2.1.3 Ensure nosuid option set on /tmp partition",
+            "details": "The /tmp directory must have the nosuid option set in the active mount.",
+            "labels": ["CIS"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": [
+                            "mountpoint",
+                            "/tmp"
+                        ]
+                    },
+                    "audit_test_name": "slash_tmp_nosuid_option",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "nosuid",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "1.1.2.1.4 Ensure noexec option set on /tmp partition",
+            "details": "The /tmp directory must have the noexec option set in the active mount.",
+            "labels": ["CIS"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": [
+                            "mountpoint",
+                            "/tmp"
+                        ]
+                    },
+                    "audit_test_name": "slash_tmp_noexec_option",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "noexec",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "2.2.2 Ensure ldap client is not installed",
+            "details": "The ldap client must not be installed on the system.",
+            "labels": ["CIS"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "haspkg",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": [
+                            "openldap-clients"
+                        ]
+                    },
+                    "audit_test_name": "ldap_client_not_installed",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "match_to": 1,
+                            "control_flag": "required",
+                            "on": "result_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "2.2.3 Ensure nis client is not installed",
+            "details": "The nis client must not be installed on the system.",
+            "labels": ["CIS"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "missingpkg",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": [
+                            "ypbind "
+                        ]
+                    },
+                    "audit_test_name": "nis_client_not_installed",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "match_to": 0,
+                            "control_flag": "required",
+                            "on": "result_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "2.3.1 Ensure time synchronization is in use",
+            "details": "Time synchronization must be in use on the system.",
+            "labels": ["CIS"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "haspkg",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": [
+                            "chrony"
+                        ]
+                    },
+                    "audit_test_name": "time_synchronization_in_use",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "match_to": 0,
+                            "control_flag": "required",
+                            "on": "result_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "2.3.2 Ensure chrony is configured",
+            "labels": [
+                "CIS"
+            ],
+            "audit": [
+                {
+                    "cmd": "grep -Ers -- '^[[:blank:]]*(server|pool)[[:blank:]]+[^#\\n\\r]' /etc/chrony.conf /etc/chrony.d/",
+                    "audit_test_name": "chrony_configured_with_servers",
+                    "response_conditions": [
+                        {
+                            "condition": "matchregex",
+                            "match_to": "server|pool",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "2.3.3 Ensure chrony is not run as the root user",
+            "labels": [
+                "CIS"
+            ],
+            "audit": [
+                {
+                    "cmd": "grep -Esi -- '^[[:blank:]]*OPTIONS=\"?[[:blank:]]*([^#]+[[:blank:]]+)?-u[[:blank:]]+root\\b' /etc/sysconfig/chronyd",
+                    "audit_test_name": "chrony_not_run_as_root",
+                    "response_conditions": [
+                        {
+                            "condition": "pass_if_no_lines",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
