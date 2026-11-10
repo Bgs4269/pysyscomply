@@ -1,0 +1,136 @@
+{
+    "title": "Mount Options Cmdlet - Realistic Tests",
+    "compiled_by": "TestUser",
+    "compiled_on": "2026-08-24T00:00:00Z",
+    "items": [
+        {
+            "name": "Test 1: Get mount options for root mountpoint",
+            "labels": ["mountopt", "mountpoint"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["mountpoint", "/"]
+                    },
+                    "audit_test_name": "root_mount_options",
+                    "response_conditions": [
+                        {
+                            "condition": "pass_if_lines",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 2: Get mount options for /proc mountpoint",
+            "labels": ["mountopt", "mountpoint"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["mountpoint", "/proc"]
+                    },
+                    "audit_test_name": "proc_mount_options",
+                    "response_conditions": [
+                        {
+                            "condition": "pass_if_lines",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 3: Verify /proc mount contains mount options",
+            "labels": ["mountopt", "options"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["mountpoint", "/proc"]
+                    },
+                    "audit_test_name": "proc_has_options",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "nosuid",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 4: Invalid type returns error exit code",
+            "labels": ["mountopt", "error"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["invalid", "/"]
+                    },
+                    "audit_test_name": "invalid_type",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 1,
+                            "control_flag": "required",
+                            "on": "return_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 5: Non-existent mountpoint returns error",
+            "labels": ["mountopt", "notfound"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["mountpoint", "/nonexistent/mount"]
+                    },
+                    "audit_test_name": "nonexistent_mount",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 1,
+                            "control_flag": "required",
+                            "on": "return_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 6: Check mount options contain noexec or not",
+            "labels": ["mountopt", "noexec"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["mountpoint", "/"]
+                    },
+                    "audit_test_name": "root_options",
+                    "response_conditions": [
+                        {
+                            "condition": "pass_if_lines",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

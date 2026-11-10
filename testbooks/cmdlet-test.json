@@ -1,0 +1,98 @@
+{
+    "title": "Cmdlet Test Suite",
+    "compiled_by": "TestUser",
+    "compiled_on": "2026-08-23T00:00:00Z",
+    "items": [
+        {
+            "name": "Test 1: Traditional cmd - Check passwd file exists",
+            "labels": ["basic"],
+            "audit": [
+                {
+                    "cmd": "test -f /etc/passwd && echo 'exists'",
+                    "audit_test_name": "passwd_exists",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "exists",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 2: Cmdlet - Check service status (systemd)",
+            "labels": ["cmdlet", "service"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "service",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["status", "systemd-journald"]
+                    },
+                    "audit_test_name": "systemd_service_check",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 0,
+                            "control_flag": "required",
+                            "on": "return_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 3: Cmdlet - Check non-existent service (should fail)",
+            "labels": ["cmdlet", "service"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "service",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["status", "nonexistent-service-xyz"]
+                    },
+                    "audit_test_name": "nonexistent_service",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 0,
+                            "control_flag": "required",
+                            "on": "return_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 4: Mixed audit blocks - cmd and validation",
+            "labels": ["basic"],
+            "audit": [
+                {
+                    "cmd": "echo 'hello'",
+                    "audit_test_name": "echo_test",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "hello",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                },
+                {
+                    "cmd": "whoami",
+                    "audit_test_name": "whoami_test",
+                    "response_conditions": [
+                        {
+                            "condition": "pass_if_lines",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
