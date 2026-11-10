@@ -1,0 +1,35 @@
+{
+  "title": "External Cmdlet Test",
+  "compiled_by": "TestUser",
+  "compiled_on": "2026-10-20",
+  "items": [
+    {
+      "name": "External cmdlet emits expected output and exit code",
+      "labels": ["cmdlet", "external"],
+      "audit": [
+        {
+          "cmdlet": {
+            "cmdlet_name": "extcmdlet",
+            "cmdlet_type": "external",
+            "cmdlet_args": []
+          },
+          "audit_test_name": "external_cmdlet_output_and_exit_code",
+          "response_conditions": [
+            {
+              "condition": "match",
+              "match_to": "CMDLET",
+              "control_flag": "required",
+              "on": "stdout"
+            },
+            {
+              "condition": "exitcode",
+              "exit_result": 0,
+              "control_flag": "required",
+              "on": "return_code"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,2 @@
-# PySysComply requirements
-# This project uses only Python standard library modules
-# No external dependencies required
-
-# Python version: 3.6+
+# pysyscomply requires Python 3.9 or newer and has no runtime dependencies.
+# Build dependencies are declared in pyproject.toml.

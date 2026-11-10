@@ -1,0 +1,95 @@
+{
+    "title": "Service Cmdlet Functions Test",
+    "compiled_by": "TestUser",
+    "compiled_on": "2026-08-24T00:00:00Z",
+    "items": [
+        {
+            "name": "Test: isrunning - Check if systemd-journald is running",
+            "labels": ["service", "isrunning"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "service",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["isrunning", "systemd-journald"]
+                    },
+                    "audit_test_name": "journald_isrunning",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "active",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test: isenabled - Check if systemd-journald is enabled",
+            "labels": ["service", "isenabled"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "service",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["isenabled", "systemd-journald"]
+                    },
+                    "audit_test_name": "journald_isenabled",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "enabled",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test: ismasked - Check if systemd-journald is NOT masked",
+            "labels": ["service", "ismasked"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "service",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["ismasked", "systemd-journald"]
+                    },
+                    "audit_test_name": "journald_ismasked",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 1,
+                            "control_flag": "required",
+                            "on": "return_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test: Unsupported function should fail",
+            "labels": ["service", "error"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "service",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["invalid_function", "sshd"]
+                    },
+                    "audit_test_name": "invalid_function",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 0,
+                            "control_flag": "required",
+                            "on": "return_code"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -13,8 +13,11 @@
 
 from __future__ import annotations
 
+__version__ = "0.4.1"
+
 import argparse
 import csv
+import importlib.util
 import json
 import os
 import platform
@@ -23,6 +26,7 @@ import shutil
 import subprocess
 import sys
 import time
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional, Set, TextIO, Tuple, Union
@@ -442,15 +446,15 @@ class InternalCmdlets:
 # Backward-compatible alias
 cmdlet_internal = InternalCmdlets
 
-# Cmdlet Registry: Maps cmdlet_name to (cmdlet_type, callable)
-CMDLET_REGISTRY: Dict[str, Tuple[str, Callable[..., Tuple[int, str, str]]]] = {
+# Cmdlet Registry: maps cmdlet_name to (cmdlet_type, callable or external file path)
+CMDLET_REGISTRY: Dict[str, Tuple[str, Union[Callable[..., Tuple[int, str, str]], str]]] = {
     'service': ('internal', InternalCmdlets.service),
     'haspkg': ('internal', InternalCmdlets.haspkg),
     'missingpkg': ('internal', InternalCmdlets.missingpkg),
     'csvfilter': ('internal', InternalCmdlets.csvfilter),
     'mountopt': ('internal', InternalCmdlets.mountopt),
     'ismount': ('internal', InternalCmdlets.ismount),
-    'bootmoxunted': ('internal', InternalCmdlets.bootmounted),
+    'bootmounted': ('internal', InternalCmdlets.bootmounted),
 }
 
 
@@ -547,6 +551,36 @@ class ComplianceBenchmarkAuditor:
             text = str(text)
         return text.encode('utf-8', errors='replace').decode('utf-8', errors='replace')
 
+    @staticmethod
+    def _execute_external_cmdlet(
+        cmdlet_name: str,
+        file_path: str,
+        args: List[str]
+    ) -> Tuple[int, str, str]:
+        """Dynamically load and execute an external cmdlet from its Python file."""
+        module_name = f'_pysyscomply_external_{uuid.uuid4().hex}'
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        if spec is None or spec.loader is None:
+            raise ImportError(f'could not load external cmdlet file: {file_path}')
+
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        try:
+            spec.loader.exec_module(module)
+            cmdlet_func = getattr(module, cmdlet_name)
+            if not callable(cmdlet_func):
+                raise TypeError(f'external cmdlet "{cmdlet_name}" is not callable')
+
+            result = cmdlet_func(args)
+            if not isinstance(result, tuple) or len(result) != 3:
+                raise TypeError('external cmdlet must return (exit_code, stdout, stderr)')
+            exit_code, stdout, stderr = result
+            if not isinstance(exit_code, int) or not isinstance(stdout, str) or not isinstance(stderr, str):
+                raise TypeError('external cmdlet must return (int, str, str)')
+            return result
+        finally:
+            sys.modules.pop(module_name, None)
+
     def auditor_engine(self, item: Dict[str, Any]) -> None:
         """Execute audit items for a given benchmark item."""
         item_name = item.get('name', '<unnamed>')
@@ -639,7 +673,20 @@ class ComplianceBenchmarkAuditor:
                         item_error = f'cmdlet "{cmdlet_name}" type mismatch: expected {registered_type}, got {cmdlet_type}'
                         break
 
-                    exit_code, c_stdout, c_stderr = cmdlet_func(cmdlet_args)
+                    if registered_type == 'external':
+                        try:
+                            if not isinstance(cmdlet_func, str):
+                                raise TypeError('external cmdlet registry entry must be a file path')
+                            exit_code, c_stdout, c_stderr = self._execute_external_cmdlet(
+                                cmdlet_name,
+                                cmdlet_func,
+                                cmdlet_args
+                            )
+                        except Exception as exc:
+                            item_error = f'EXT-CMDLET-ERR: {exc}'
+                            break
+                    else:
+                        exit_code, c_stdout, c_stderr = cmdlet_func(cmdlet_args)
                     exec_result = CommandExecutionResult(exit_code, c_stdout, c_stderr)
 
             except subprocess.TimeoutExpired:
@@ -695,6 +742,8 @@ class ComplianceBenchmarkAuditor:
             finding['pass_logic_result'] = item_pass
         if item_error is not None:
             finding['errors'] = [item_error]
+            if item_error.startswith('EXT-CMDLET-ERR: '):
+                finding['reasoning'] = item_error
 
         self.log_data['findings'].append(finding)
 

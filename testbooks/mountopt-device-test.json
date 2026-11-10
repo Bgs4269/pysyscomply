@@ -1,0 +1,50 @@
+{
+    "title": "Mount Options - Device Query Test",
+    "compiled_by": "TestUser",
+    "compiled_on": "2026-08-24T00:00:00Z",
+    "items": [
+        {
+            "name": "Test 1: Query by device - root filesystem",
+            "labels": ["mountopt", "device"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["device", "/dev/mapper/luks-66751fb1-a663-4cfe-a48b-10fcb25ab539"]
+                    },
+                    "audit_test_name": "device_options",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "ro",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 2: Query by device - proc filesystem",
+            "labels": ["mountopt", "device"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["device", "proc"]
+                    },
+                    "audit_test_name": "proc_device_options",
+                    "response_conditions": [
+                        {
+                            "condition": "pass_if_lines",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
