@@ -1,0 +1,116 @@
+{
+    "title": "Mount Options Cmdlet Test",
+    "compiled_by": "TestUser",
+    "compiled_on": "2026-08-24T00:00:00Z",
+    "items": [
+        {
+            "name": "Test 1: Get mount options for root mountpoint",
+            "labels": ["mountopt", "mountpoint"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["mountpoint", "/"]
+                    },
+                    "audit_test_name": "root_mount_options",
+                    "response_conditions": [
+                        {
+                            "condition": "pass_if_lines",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 2: Get mount options for /proc mountpoint",
+            "labels": ["mountopt", "mountpoint"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["mountpoint", "/proc"]
+                    },
+                    "audit_test_name": "proc_mount_options",
+                    "response_conditions": [
+                        {
+                            "condition": "match",
+                            "match_to": "rw",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 3: Check /proc is not mounted read-only",
+            "labels": ["mountopt", "ro"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["mountpoint", "/proc"]
+                    },
+                    "audit_test_name": "proc_not_readonly",
+                    "response_conditions": [
+                        {
+                            "condition": "no_match",
+                            "no_match_for": "ro",
+                            "control_flag": "optional",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 4: Invalid type should fail",
+            "labels": ["mountopt", "error"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["invalid", "/"]
+                    },
+                    "audit_test_name": "invalid_type",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 0,
+                            "control_flag": "required",
+                            "on": "return_code"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test 5: Non-existent mountpoint should fail",
+            "labels": ["mountopt", "notfound"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_name": "mountopt",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["mountpoint", "/nonexistent/mount"]
+                    },
+                    "audit_test_name": "nonexistent_mount",
+                    "response_conditions": [
+                        {
+                            "condition": "exitcode",
+                            "exit_result": 0,
+                            "control_flag": "required",
+                            "on": "return_code"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

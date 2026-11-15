@@ -41,19 +41,52 @@
               "type": "string"
             }
           },
+          "details": {
+            "type": "string",
+            "description": "Optional details for this test item; not included in result JSON"
+          },
           "audit": {
             "type": "array",
             "description": "List of audit commands to execute for this test",
             "items": {
               "type": "object",
-              "required": [
-                "cmd",
-                "response_conditions"
+              "oneOf": [
+                {
+                  "required": ["cmd", "response_conditions"],
+                  "not": { "required": ["cmdlet"] }
+                },
+                {
+                  "required": ["cmdlet", "response_conditions"],
+                  "not": { "required": ["cmd"] }
+                }
               ],
               "properties": {
                 "cmd": {
                   "type": "string",
                   "description": "Shell command to execute"
+                },
+                "cmdlet": {
+                  "type": "object",
+                  "description": "Cmdlet specification (alternative to cmd)",
+                  "required": ["cmdlet_name", "cmdlet_type", "cmdlet_args"],
+                  "properties": {
+                    "cmdlet_name": {
+                      "type": "string",
+                      "description": "Name of the cmdlet to execute (e.g., 'service')"
+                    },
+                    "cmdlet_type": {
+                      "type": "string",
+                      "enum": ["internal", "external"],
+                      "description": "Type of cmdlet: 'internal' (defined in main file) or 'external' (from dynamic source)"
+                    },
+                    "cmdlet_args": {
+                      "type": "array",
+                      "description": "Arguments to pass to the cmdlet function",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
                 },
                 "response_conditions": {
                   "type": "array",
@@ -70,7 +103,12 @@
                         "type": "string",
                         "enum": [
                           "like",
+                          "match",
+                          "matchregex",
                           "not_like",
+                          "no_match",
+                          "exitcode",
+                          "not_exitcode",
                           "pass_if_no_lines",
                           "pass_if_lines",
                           "default_pass"
@@ -79,11 +117,27 @@
                       },
                       "like_to": {
                         "type": "string",
-                        "description": "String to search for in output (used with 'like' condition)"
+                        "description": "String to search for in output (used with 'like' or 'match' condition)"
+                      },
+                      "match_to": {
+                        "type": "string",
+                        "description": "String or regular expression to search for in output (used with 'match' or 'matchregex' condition)"
                       },
                       "not_like_to": {
                         "type": "string",
                         "description": "String that should NOT be in output (used with 'not_like' condition)"
+                      },
+                      "no_match_for": {
+                        "type": "string",
+                        "description": "String that should NOT be in output (used with 'no_match' condition)"
+                      },
+                      "no_match_to": {
+                        "type": "string",
+                        "description": "String that should NOT be in output (used with 'no_match' condition)"
+                      },
+                      "exit_result": {
+                        "type": "integer",
+                        "description": "Expected exit code (used with 'exitcode' or 'not_exitcode' condition)"
                       },
                       "control_flag": {
                         "type": "string",
@@ -97,12 +151,21 @@
                         "type": "string",
                         "enum": [
                           "stdout",
-                          "stderr"
+                          "stderr",
+                          "return_code"
                         ],
-                        "description": "Whether to evaluate condition against stdout or stderr"
+                        "description": "Whether to evaluate condition against stdout, stderr, or return_code"
                       }
                     }
                   }
+                },
+                "audit_test_name": {
+                  "type": "string",
+                  "description": "Name identifier for this audit test (required when pass_logic is used)"
+                },
+                "details": {
+                  "type": "string",
+                  "description": "Optional details for this audit test; not included in result JSON"
                 },
                 "labels": {
                   "type": "array",

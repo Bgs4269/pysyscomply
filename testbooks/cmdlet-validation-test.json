@@ -1,0 +1,47 @@
+{
+    "title": "Cmdlet Validation Test",
+    "compiled_by": "TestUser",
+    "compiled_on": "2026-08-23T00:00:00Z",
+    "items": [
+        {
+            "name": "Test: Both cmd and cmdlet should fail",
+            "labels": ["validation"],
+            "audit": [
+                {
+                    "cmd": "echo 'test'",
+                    "cmdlet": {
+                        "cmdlet_name": "service",
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["status", "sshd"]
+                    },
+                    "response_conditions": [
+                        {
+                            "condition": "default_pass",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Test: Missing cmdlet_name should fail",
+            "labels": ["validation"],
+            "audit": [
+                {
+                    "cmdlet": {
+                        "cmdlet_type": "internal",
+                        "cmdlet_args": ["status", "sshd"]
+                    },
+                    "response_conditions": [
+                        {
+                            "condition": "default_pass",
+                            "control_flag": "required",
+                            "on": "stdout"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
