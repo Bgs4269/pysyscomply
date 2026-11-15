@@ -18,16 +18,16 @@ version is 0.4.1. The benchmark definition is described by
 Install from the project root with `python -m pip install .`. The package
 provides both an importable `pysyscomply` module and a `pysyscomply` command.
 
-## Command Line
+## Command Line (CLI mode)
 
 Run one or more benchmark files:
 
 ```sh
-pysyscomply benchmark.json
-pysyscomply benchmark.json additional.json -o report.json
+python3 ./pysyscomply-cli.py benchmark.json
+python3 ./pysyscomply-cli.py benchmark.json additional.json -o report.json
 ```
 
-You can also run it as a module with `python -m pysyscomply`.
+You can also run it as a module with `python3 -m pysyscomply`.
 
 Options:
 
@@ -60,13 +60,13 @@ with ComplianceBenchmarkAuditor(
 `run()` returns `0` for a passing scan and `1` when any test fails. The report
 is finalized by `close()`, which is called automatically by the context manager.
 
-## Benchmark JSON
+## Testbook/benchmark JSON
 
-A benchmark is an object with a required `title` and `items` array. Each item
+A testbook is an object with a required `title` and `items` array. Each item
 has a required `name` and `audit` array. An audit block contains either a shell
 `cmd` or a `cmdlet`, never both, and must include `response_conditions`.
 
-Minimal command benchmark:
+Minimal command test example:
 
 ```json
 {
@@ -237,3 +237,17 @@ python -m build
 The GitHub Actions release workflow builds source and wheel distributions and
 attaches them to a GitHub Release when a `v*` tag is pushed. Keep the version in
 `pyproject.toml` aligned with the tag (for example, `0.4.1` and `v0.4.1`).
+
+## Example testbooks
+
+The testbooks in this repository are meant to be use for testing, and a best 
+effort replication of CIS rules, but not officially supported.
+
+They are share as is, and you use them at your own risk. Always test them before using them.
+
+## Contribution
+
+Bug fixes are always welcome.
+
+New features will always be considered. Inclusion will primarily decided based on quality 
+of code and making sure it doesn't break the general purpose of the library.
